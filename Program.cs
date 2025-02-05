@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
+using Bank2Excel2Chart.Services;
+using Bank2Excel2Chart.Services.PdfProcessing;
+using Bank2Excel2Chart.Services.ExcelGeneration;
+using Bank2Excel2Chart.Services.Conversion;
+using System.Text;
 
 namespace Bank2Excel2Chart
 {
@@ -26,8 +31,19 @@ namespace Bank2Excel2Chart
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDBcontext>();
 
+            //Add Interface services
+            builder.Services.AddScoped<IPdfTableExtractorService, PdfTableExtractorService>();
+            builder.Services.AddScoped<IExcelTableGeneratorService, ExcelTableGeneratorService>();
+            builder.Services.AddScoped<IEnhancedPdfToExcelConverterService, Pdf2ExcelConverterService>();
+
+            // Required for iTextSharp
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+
+
 
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
